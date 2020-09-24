@@ -18,7 +18,8 @@ import {
 // AirConditionerAPI
 // AirConditioner
 
-import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from './AirConditionerAPI';
+// import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from './AirConditionerAPI';
+import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from 'broadlink-aircon-api';
 
 export class AirCondionerAccessory implements AccessoryPlugin {
 
@@ -86,6 +87,7 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     }, 5000);
 
     this.airConditionerAPI.on('updateState', () => {
+      console.log('updateState');
       this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).value = this.thresholdTemperature();
       this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).value = this.thresholdTemperature();
       this.service.getCharacteristic(api.hap.Characteristic.CurrentHeaterCoolerState).value = this.currentHeaterCoolerState();
