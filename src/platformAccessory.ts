@@ -9,7 +9,11 @@ import {
   HAP,
   Logging,
   Service,
+  
 } from 'homebridge';
+// import {
+//   HomeKitTypes
+// } from './node_modules/homebridge/lib';
 
 // AirConditionerAPI
 // AirConditioner
@@ -79,8 +83,18 @@ export class AirCondionerAccessory implements AccessoryPlugin {
 
     setInterval(() => {
       this.airConditionerAPI.getState();
-      // this.service.getCharacteristic(this.api.hap.Characteristic.On).setValue(this.airConditionerAPI.model.power === State.on);
     }, 5000);
+
+    this.airConditionerAPI.on('updateState', () => {
+      this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).value = this.thresholdTemperature();
+      this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).value = this.thresholdTemperature();
+      this.service.getCharacteristic(api.hap.Characteristic.CurrentHeaterCoolerState).value = this.currentHeaterCoolerState();
+      this.service.getCharacteristic(api.hap.Characteristic.TargetHeaterCoolerState).value = this.targetHeaterCoolerState();
+      this.service.getCharacteristic(api.hap.Characteristic.Active).value = this.active();
+      this.service.getCharacteristic(api.hap.Characteristic.CurrentTemperature).value = this.currentTemperature();
+      // this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).value = this.thresholdTemperature();
+  
+    });
 
   }
 
@@ -91,18 +105,19 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     ];
   }
 
-  /**
-   * Handle requests to get the current value of the "Active" characteristic
-   */
-  handleActiveGet(callback) {
-    this.log.debug('Triggered GET Active');
-
-    // set this to a valid value for Active
+  active(): number {
     let currentValue = 0;
     if (this.airConditionerAPI.model.power === State.on) {
       currentValue = 1;
     } 
-    // const currentValue = 1;
+
+    return currentValue;
+  }
+
+  handleActiveGet(callback) {
+    this.log.debug('Triggered GET Active');
+
+    const currentValue = this.active();
 
     callback(null, currentValue);
   }
@@ -114,27 +129,13 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     this.log.debug('Triggered SET Active:', value);
     if (value === 1) {
       this.airConditionerAPI.setPower(State.on);
-    } else {
-      this.airConditionerAPI.setPower(State.off);
+
     }
     callback(null);
+
   }
 
-  //   export declare class CurrentHeaterCoolerState extends Characteristic {
-  //     static readonly INACTIVE = 0;
-  //     static readonly IDLE = 1;
-  //     static readonly HEATING = 2;
-  //     static readonly COOLING = 3;
-  //     static readonly UUID: string;
-  //     constructor();
-  // }
-  /**
-   * Handle requests to get the current value of the "Current Heater Cooler State" characteristic
-   */
-  handleCurrentHeaterCoolerStateGet(callback) {
-    this.log.debug('Triggered GET CurrentHeaterCoolerState');
-
-    // set this to a valid value for CurrentHeaterCoolerState
+  private currentHeaterCoolerState(): number {
     let currentValue = this.api.hap.Characteristic.CurrentHeaterCoolerState.INACTIVE;
     if (this.airConditionerAPI.model.mode === Mode.cooling) {
       currentValue = this.api.hap.Characteristic.CurrentHeaterCoolerState.COOLING;
@@ -144,22 +145,22 @@ export class AirCondionerAccessory implements AccessoryPlugin {
       currentValue = this.api.hap.Characteristic.CurrentHeaterCoolerState.IDLE;
     }
 
+    return currentValue;
+  }
+
+  /**
+   * Handle requests to get the current value of the "Current Heater Cooler State" characteristic
+   */
+  handleCurrentHeaterCoolerStateGet(callback) {
+    this.log.debug('Triggered GET CurrentHeaterCoolerState');
+
+    // set this to a valid value for CurrentHeaterCoolerState
+    const currentValue = this.currentHeaterCoolerState();
+
     callback(null, currentValue);
   }
 
-  //   export declare class TargetHeaterCoolerState extends Characteristic {
-  //     static readonly AUTO = 0;
-  //     static readonly HEAT = 1;
-  //     static readonly COOL = 2;
-  //     static readonly UUID: string;
-  //     constructor();
-  // }
-  /**
-   * Handle requests to get the current value of the "Target Heater Cooler State" characteristic
-   */
-  handleTargetHeaterCoolerStateGet(callback) {
-    this.log.debug('Triggered GET TargetHeaterCoolerState');
-
+  private targetHeaterCoolerState(): number {
     let currentValue = this.api.hap.Characteristic.TargetHeaterCoolerState.AUTO;
     if (this.airConditionerAPI.model.mode === Mode.cooling) {
       currentValue = this.api.hap.Characteristic.TargetHeaterCoolerState.COOL;
@@ -169,7 +170,16 @@ export class AirCondionerAccessory implements AccessoryPlugin {
       currentValue = this.api.hap.Characteristic.TargetHeaterCoolerState.AUTO;
     }
 
-    // set this to a valid value for TargetHeaterCoolerState
+    return currentValue;
+  }
+
+  /**
+   * Handle requests to get the current value of the "Target Heater Cooler State" characteristic
+   */
+  handleTargetHeaterCoolerStateGet(callback) {
+    this.log.debug('Triggered GET TargetHeaterCoolerState');
+
+    const currentValue = this.targetHeaterCoolerState();
 
     callback(null, currentValue);
   }
@@ -191,6 +201,10 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     callback(null);
   }
 
+  private currentTemperature(): number {
+    return this.airConditionerAPI.model.ambientTemp;
+  }
+
   /**
    * Handle requests to get the current value of the "Current Temperature" characteristic
    */
@@ -198,7 +212,7 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     this.log.debug('Triggered GET CurrentTemperature');
 
     // set this to a valid value for CurrentTemperature
-    const currentValue = this.airConditionerAPI.model.ambientTemp;
+    const currentValue = this.currentTemperature();
 
     callback(null, currentValue);
   }
@@ -211,11 +225,15 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     callback(null);
   }
 
+  private thresholdTemperature(): number {
+    return this.airConditionerAPI.model.temp;
+  }
+
   handleThresholdTemperatureGet(callback) {
     this.log.debug('Triggered GET ThresholdTemperature');
 
     // set this to a valid value for CurrentTemperature
-    const currentValue = this.airConditionerAPI.model.temp;
+    const currentValue = this.thresholdTemperature();
 
     callback(null, currentValue);
   }

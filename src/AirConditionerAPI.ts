@@ -6,6 +6,7 @@ import { RemoteInfo, SocketType, Socket } from 'dgram';
 import { DgramAsPromised } from 'dgram-as-promised';
 // import { AddressInfo } from 'net';
 import * as Crypto from 'crypto';
+import { EventEmitter } from 'events';
 
 
 export declare const enum Command {
@@ -70,6 +71,18 @@ export class AirConditioner {
    }
 }
 
+export declare interface Feedback {
+  on(event: 'updateState', listener: (name: AirConditioner) => void): this;
+  // on(event: string, listener: Function): this;
+}
+
+class ApiFeedback extends EventEmitter {
+  emitUpdateState(airCon: AirConditioner): void {
+    this.emit('updateState', airCon);
+  }
+}
+
+
 export class AirConditionerAPI {
 
     private defaultIV = new Buffer([0x56, 0x2e, 0x17, 0x99, 0x6d, 0x09, 0x3d, 0x28, 0xdd, 0xb3, 0xba, 0x69, 0x5a, 0x2e, 0x6f, 0x58])
@@ -80,6 +93,7 @@ export class AirConditionerAPI {
     private count = 1;
     private readonly ip: string;
     model = new AirConditioner()
+    feedback = new ApiFeedback()
     // private readonly mac: string;
   
     // private readonly switchService: Service;
@@ -92,6 +106,10 @@ export class AirConditionerAPI {
         return parseInt(value, 16); 
       });
       this.mac = new Buffer(array);
+    }
+
+    on(event: 'updateState', listener: (airCon: AirConditioner) => void) {
+      this.feedback.on('updateState', listener);
     }
 
     async connect() {
@@ -125,6 +143,7 @@ export class AirConditionerAPI {
           // this.emit('deviceReady');
         } else if (command === 0xee) {
           this.updateStatus(payload);
+          this.updateInfo(payload);
           ////console.log('payload' + payload);
           ////console.log(payload);
           // this.emit('payload', err, payload);
@@ -238,8 +257,19 @@ export class AirConditionerAPI {
         ////console.log('this.model.turbo ' + this.model.turbo);
         this.model.clean = payload[20] >> 2 & 0b00000001;
         ////console.log('this.model.clean ' + this.model.clean);
+        this.getInfo();
+        this.feedback.emitUpdateState(this.model);
       }
       
+    }
+
+    private updateInfo(payload: Buffer) {
+      if (payload.length === 48) {
+        const amb_05 = payload[33] / 10;
+        const amb = payload[15] & 0b00011111;
+        this.model.ambientTemp = amb_05 + amb;
+        this.feedback.emitUpdateState(this.model);
+      }
     }
 
     async getState() {
@@ -432,3 +462,6 @@ export class AirConditionerAPI {
 
   // }
 }
+
+
+
