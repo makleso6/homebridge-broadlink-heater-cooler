@@ -131,7 +131,8 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     this.log.debug('Triggered SET Active:', value);
     if (value === 1) {
       this.airConditionerAPI.setPower(State.on);
-
+    } else {
+      this.airConditionerAPI.setPower(State.off);
     }
     callback(null);
 
