@@ -18,8 +18,8 @@ import {
 // AirConditionerAPI
 // AirConditioner
 
-// import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from './AirConditionerAPI';
-import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from 'broadlink-aircon-api';
+import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from './AirConditionerAPI';
+// import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from 'broadlink-aircon-api';
 
 export class AirCondionerAccessory implements AccessoryPlugin {
 
@@ -88,12 +88,12 @@ export class AirCondionerAccessory implements AccessoryPlugin {
 
     this.airConditionerAPI.on('updateState', () => {
       console.log('updateState');
-      this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).value = this.thresholdTemperature();
-      this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).value = this.thresholdTemperature();
-      this.service.getCharacteristic(api.hap.Characteristic.CurrentHeaterCoolerState).value = this.currentHeaterCoolerState();
-      this.service.getCharacteristic(api.hap.Characteristic.TargetHeaterCoolerState).value = this.targetHeaterCoolerState();
-      this.service.getCharacteristic(api.hap.Characteristic.Active).value = this.active();
-      this.service.getCharacteristic(api.hap.Characteristic.CurrentTemperature).value = this.currentTemperature();
+      this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).updateValue(this.thresholdTemperature());
+      this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).updateValue(this.thresholdTemperature());
+      this.service.getCharacteristic(api.hap.Characteristic.CurrentHeaterCoolerState).updateValue(this.currentHeaterCoolerState());
+      this.service.getCharacteristic(api.hap.Characteristic.TargetHeaterCoolerState).updateValue(this.targetHeaterCoolerState());
+      this.service.getCharacteristic(api.hap.Characteristic.Active).updateValue(this.active());
+      this.service.getCharacteristic(api.hap.Characteristic.CurrentTemperature).updateValue(this.currentTemperature());
       // this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).value = this.thresholdTemperature();
   
     });
