@@ -127,7 +127,7 @@ export class AirConditionerAPI {
       //   this.auth();
       // });
       this.socket.socket.on('message', (msg, rinfo) => {
-        console.log('recive payload');
+        console.log('recive msg', msg.length);
 
         const command = msg[0x26];
 
@@ -142,12 +142,13 @@ export class AirConditionerAPI {
           payload.copy(this.id, 0, 0x00, 0x04);
           // this.emit('deviceReady');
         } else if (command === 0xee) {
+          console.log('recive payload', payload.length);
+
           const packet_type = payload[4]; 
-          if (packet_type === 0x07) {
-            console.log('packet_type', packet_type);
-          } else {
-            console.log('packet_type', packet_type);
-          }
+          if (packet_type !== 0x07) {
+            return;
+            // console.log('packet_type', packet_type);
+          } 
           //     packet_type = response_payload[4]			
           // if packet_type != 0x07:  ##Should be result packet, otherwise something weird
           // 	return False

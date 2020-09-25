@@ -39,10 +39,7 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     const mac: string = config['mac'] as string;
     let increments = 0.5;
     if ('increments' in config) {
-      console.log('contains');
       increments = config['increments'] as number;
-    } else {
-      console.log('empty');
     }
     // console.log('ip', ip);
     // console.log('mac', mac);
