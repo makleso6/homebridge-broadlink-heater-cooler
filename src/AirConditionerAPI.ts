@@ -493,7 +493,7 @@ export class AirConditionerAPI {
       if (turbo === State.on && mute === State.on) {
         return;
       }
-      if (this.model.fanspeed === speed) {
+      if (this.model.fanspeed === speed && this.model.turbo === turbo && this.model.mute === mute) {
         return;
       }
       this.model.fanspeed = speed;
