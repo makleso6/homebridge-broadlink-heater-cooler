@@ -18,8 +18,8 @@ import {
 // AirConditionerAPI
 // AirConditioner
 
-// import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from './AirConditionerAPI';
-import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from 'broadlink-aircon-api';
+import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from './AirConditionerAPI';
+// import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from 'broadlink-aircon-api';
 
 export class AirCondionerAccessory implements AccessoryPlugin {
 
