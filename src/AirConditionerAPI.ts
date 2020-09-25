@@ -127,7 +127,7 @@ export class AirConditionerAPI {
       //   this.auth();
       // });
       this.socket.socket.on('message', (msg, rinfo) => {
-        console.log('recive msg', msg.length);
+        // console.log('recive msg', msg.length);
 
         const command = msg[0x26];
 
@@ -142,21 +142,15 @@ export class AirConditionerAPI {
           payload.copy(this.id, 0, 0x00, 0x04);
           // this.emit('deviceReady');
         } else if (command === 0xee) {
-          console.log('recive payload', payload.length);
 
           const packet_type = payload[4]; 
           if (packet_type !== 0x07) {
             return;
-            // console.log('packet_type', packet_type);
           } 
-          //     packet_type = response_payload[4]			
-          // if packet_type != 0x07:  ##Should be result packet, otherwise something weird
-          // 	return False
+
           this.updateStatus(payload);
           this.updateInfo(payload);
-          ////console.log('payload' + payload);
-          ////console.log(payload);
-          // this.emit('payload', err, payload);
+
         }
       });
     }
@@ -180,9 +174,9 @@ export class AirConditionerAPI {
         temperature = device.temp - 8;
 
         if (Number.isInteger(device.temp)) {
-          console.log('integer');
+          // console.log('integer');
         } else {
-          console.log('not integer');
+          // console.log('not integer');
           temperature_05 = 1;	
         }
       }
@@ -224,7 +218,7 @@ export class AirConditionerAPI {
       request_payload[length + 2] = ((crc >> 8) & 0xFF);
       request_payload[length + 3] = crc & 0xFF;
 
-      console.log('send set request');
+      // console.log('send set request');
       this.send(request_payload, 0x6a);//sendPacket(0x6a, request_payload);
     }
 
@@ -245,7 +239,7 @@ export class AirConditionerAPI {
 
     private updateStatus(payload: Buffer) {
       if (payload.length === 32) {
-        console.log('did update state');
+        // console.log('did update state');
         this.model.temp = 8 + (payload[12] >>3 );// + (0.5 * float(payload[14]>>7));
         ////console.log('this.model.temp ' + this.model.temp);
         this.model.power = payload[20] >> 5 & 0b00000001;
@@ -466,6 +460,46 @@ export class AirConditionerAPI {
         return;
       }
       this.model.temp = temp;
+      this.updateModel(this.model);
+    }
+
+    setFanSpeed(speed: Fanspeed) {
+      if (this.model.fanspeed === speed) {
+        return;
+      }
+      this.model.fanspeed = speed;
+      this.updateModel(this.model);
+    }
+
+    setMute(state: State) {
+      if (this.model.mute === state) {
+        return;
+      }
+      this.model.mute = state;
+      this.model.turbo = State.off;
+      this.updateModel(this.model);
+    }
+
+    setTurbo(state: State) {
+      if (this.model.turbo === state) {
+        return;
+      }
+      this.model.mute = State.off;
+      this.model.turbo = state ;
+      this.updateModel(this.model);
+    }
+
+    setSpeed(speed: Fanspeed, turbo: State, mute: State) {
+      if (turbo === State.on && mute === State.on) {
+        return;
+      }
+      if (this.model.fanspeed === speed) {
+        return;
+      }
+      this.model.fanspeed = speed;
+      this.model.turbo = turbo ;
+      this.model.mute = mute ;
+
       this.updateModel(this.model);
     }
 

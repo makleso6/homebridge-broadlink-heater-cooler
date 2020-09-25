@@ -27,7 +27,7 @@ export class AirCondionerAccessory implements AccessoryPlugin {
   private readonly api: API;
   private readonly name: string;
   private airConditionerAPI: AirConditionerAPI;
-
+  private lastRotationSpeed = 1;
   private readonly service: Service;
   private readonly informationService: Service;
 
@@ -73,10 +73,17 @@ export class AirCondionerAccessory implements AccessoryPlugin {
       .on('get', this.handleThresholdTemperatureGet.bind(this))
       .on('set', this.handleThresholdTemperatureSet.bind(this));
 
+    this.service.getCharacteristic(api.hap.Characteristic.RotationSpeed)
+      .on('get', this.handleRotationSpeedGet.bind(this))
+      .on('set', this.handleRotationSpeedSet.bind(this));
+
     this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).props.minValue = 16;
     this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).props.maxValue = 32;
     this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.minValue = 16;
     this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.maxValue = 32;
+
+    this.service.getCharacteristic(api.hap.Characteristic.RotationSpeed).props.minValue = 1;
+    this.service.getCharacteristic(api.hap.Characteristic.RotationSpeed).props.maxValue = 5;
 
     this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).props.minStep = increments;
     this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.minStep = increments;
@@ -215,23 +222,15 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     return this.airConditionerAPI.model.ambientTemp;
   }
 
-  /**
-   * Handle requests to get the current value of the "Current Temperature" characteristic
-   */
   handleCurrentTemperatureGet(callback) {
     this.log.debug('Triggered GET CurrentTemperature');
-
-    // set this to a valid value for CurrentTemperature
     const currentValue = this.currentTemperature();
-
     callback(null, currentValue);
   }
 
   handleThresholdTemperatureSet(value, callback) {
     this.log.debug('Triggered SET ThresholdTemperature:', value);
-    
     this.airConditionerAPI.setTemp(value);
-
     callback(null);
   }
 
@@ -247,4 +246,49 @@ export class AirCondionerAccessory implements AccessoryPlugin {
 
     callback(null, currentValue);
   }
+
+  
+  private rotationSpeed(): number {
+    let currentValue = 1;
+     
+    if (this.airConditionerAPI.model.turbo === State.on) {
+      currentValue = 5;
+    } else if (this.airConditionerAPI.model.mute === State.on) {
+      currentValue = 1;
+    } else if (this.airConditionerAPI.model.fanspeed === Fanspeed.high) {
+      currentValue = 4;
+    } else if (this.airConditionerAPI.model.fanspeed === Fanspeed.medium) {
+      currentValue = 3;
+    } else if (this.airConditionerAPI.model.fanspeed === Fanspeed.low) {
+      currentValue = 2;
+    }
+    return currentValue;
+  }
+
+  handleRotationSpeedGet(callback) {
+    this.log.debug('Triggered GET RotationSpeed');
+    const currentValue = this.rotationSpeed();
+    callback(null, currentValue);
+  }
+
+  handleRotationSpeedSet(value, callback) {
+    this.log.debug('Triggered SET RotationSpeed:', value);
+    if (value === 1) {
+      this.airConditionerAPI.setSpeed(this.lastRotationSpeed, State.off, State.on);
+    } else if (value === 2) {
+      this.airConditionerAPI.setFanSpeed(Fanspeed.low);
+      this.lastRotationSpeed = value;
+    } else if (value === 3) {
+      this.airConditionerAPI.setFanSpeed(Fanspeed.medium);
+      this.lastRotationSpeed = value;
+    } else if (value === 4) {
+      this.airConditionerAPI.setFanSpeed(Fanspeed.high);
+      this.lastRotationSpeed = value;
+    } else if (value === 5) {
+      this.airConditionerAPI.setSpeed(this.lastRotationSpeed, State.on, State.off);
+    }
+
+    callback(null);
+  }
+
 }
