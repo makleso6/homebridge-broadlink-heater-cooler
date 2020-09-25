@@ -37,6 +37,13 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     this.api = api;
     const ip: string = config['ip'] as string;
     const mac: string = config['mac'] as string;
+    let increments = 0.5;
+    if ('increments' in config) {
+      console.log('contains');
+      increments = config['increments'] as number;
+    } else {
+      console.log('empty');
+    }
     // console.log('ip', ip);
     // console.log('mac', mac);
 
@@ -73,7 +80,10 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).props.maxValue = 32;
     this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.minValue = 16;
     this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.maxValue = 32;
-    
+
+    this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).props.minStep = increments;
+    this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.minStep = increments;
+
     this.informationService = new api.hap.Service.AccessoryInformation()
       .setCharacteristic(api.hap.Characteristic.Manufacturer, 'Custom Manufacturer')
       .setCharacteristic(api.hap.Characteristic.Model, 'Custom Model');
@@ -87,7 +97,7 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     }, 5000);
 
     this.airConditionerAPI.on('updateState', () => {
-      // console.log('updateState');
+      console.log('updateState');
       this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).updateValue(this.thresholdTemperature());
       this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).updateValue(this.thresholdTemperature());
       this.service.getCharacteristic(api.hap.Characteristic.CurrentHeaterCoolerState).updateValue(this.currentHeaterCoolerState());

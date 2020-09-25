@@ -127,7 +127,7 @@ export class AirConditionerAPI {
       //   this.auth();
       // });
       this.socket.socket.on('message', (msg, rinfo) => {
-        //console.log('recive payload' + msg.length);
+        console.log('recive payload');
 
         const command = msg[0x26];
 
@@ -142,6 +142,15 @@ export class AirConditionerAPI {
           payload.copy(this.id, 0, 0x00, 0x04);
           // this.emit('deviceReady');
         } else if (command === 0xee) {
+          const packet_type = payload[4]; 
+          if (packet_type === 0x07) {
+            console.log('packet_type', packet_type);
+          } else {
+            console.log('packet_type', packet_type);
+          }
+          //     packet_type = response_payload[4]			
+          // if packet_type != 0x07:  ##Should be result packet, otherwise something weird
+          // 	return False
           this.updateStatus(payload);
           this.updateInfo(payload);
           ////console.log('payload' + payload);
@@ -160,17 +169,21 @@ export class AirConditionerAPI {
       // }
       this.model = device;
       let temperature = 0; //= 20 - 8
-      // let temperature_05 = 0;
+      let temperature_05 = 0;
 
       if (device.temp < 16) {
         temperature = 16 - 8;
-        // temperature_05 = 0;
       } else if (device.temp > 32) {
         temperature = 32 - 8;
-        // temperature_05 = 0;
       } else {
         temperature = device.temp - 8;
-        // temperature_05 = 0;
+
+        if (Number.isInteger(device.temp)) {
+          console.log('integer');
+        } else {
+          console.log('not integer');
+          temperature_05 = 1;	
+        }
       }
 
       const payload = Buffer.alloc(23, 0);
@@ -187,7 +200,7 @@ export class AirConditionerAPI {
       payload[10] = 0b00000000 | temperature << 3 | device.verticalFixation;
       //        payload[10] = 0b00000000 | 8 << 3 | 0
       payload[11] = 0b00000000 | device.horizontalFixation << 5;
-      payload[12] = 0b00001111 | 0 << 7;   //# bit 1:  0.5  #bit   if 0b?1 then nothing done....  last 6 is some sort of packet_id
+      payload[12] = 0b00001111 | temperature_05 << 7;  
       payload[13] = 0b00000000 | device.fanspeed << 5;//self.status['fanspeed'] << 5
       payload[14] = 0b00000000 | device.turbo << 6 | device.mute << 7; 
       payload[15] = 0b00000000 | device.mode << 5 | device.sleep << 2;
@@ -210,6 +223,7 @@ export class AirConditionerAPI {
       request_payload[length + 2] = ((crc >> 8) & 0xFF);
       request_payload[length + 3] = crc & 0xFF;
 
+      console.log('send set request');
       this.send(request_payload, 0x6a);//sendPacket(0x6a, request_payload);
     }
 
@@ -230,6 +244,7 @@ export class AirConditionerAPI {
 
     private updateStatus(payload: Buffer) {
       if (payload.length === 32) {
+        console.log('did update state');
         this.model.temp = 8 + (payload[12] >>3 );// + (0.5 * float(payload[14]>>7));
         ////console.log('this.model.temp ' + this.model.temp);
         this.model.power = payload[20] >> 5 & 0b00000001;
@@ -315,6 +330,9 @@ export class AirConditionerAPI {
     private async send(payload: Buffer, command: number) {
 
       let packet = Buffer.alloc(0x38, 0);
+      if (this.count === 65535) {
+        this.count = 1;
+      }
       this.count = (this.count + 1) & 0xffff;
 
       packet[0x00] = 0x5a;
