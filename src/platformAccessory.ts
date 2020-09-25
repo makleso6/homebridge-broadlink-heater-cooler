@@ -276,13 +276,13 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     if (value === 1) {
       this.airConditionerAPI.setSpeed(this.lastRotationSpeed, State.off, State.on);
     } else if (value === 2) {
-      this.airConditionerAPI.setFanSpeed(Fanspeed.low);
+      this.airConditionerAPI.setSpeed(Fanspeed.low, State.off, State.on);
       this.lastRotationSpeed = value;
     } else if (value === 3) {
-      this.airConditionerAPI.setFanSpeed(Fanspeed.medium);
+      this.airConditionerAPI.setSpeed(Fanspeed.medium, State.off, State.on);
       this.lastRotationSpeed = value;
     } else if (value === 4) {
-      this.airConditionerAPI.setFanSpeed(Fanspeed.high);
+      this.airConditionerAPI.setSpeed(Fanspeed.high, State.off, State.on);
       this.lastRotationSpeed = value;
     } else if (value === 5) {
       this.airConditionerAPI.setSpeed(this.lastRotationSpeed, State.on, State.off);
