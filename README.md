@@ -17,7 +17,8 @@ example config
             "accessory": "AirCondionerAccessory",
             "ip": "192.168.1.76",
             "mac": "34:ea:34:96:e7:05",
-            "name": "AirCon"
+            "name": "AirCon",
+            "increments": 0.5 or 1.0
         }
     ],
     "platforms": [
