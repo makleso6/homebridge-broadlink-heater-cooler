@@ -357,13 +357,13 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     this.log.debug('Triggered SET RotationSpeed:', value);
     if (value > 1 && value < 19) {
       this.airConditionerAPI.setSpeed(this.lastRotationSpeed, State.off, State.on);
-    } else if (value > 19 && value < 39) {
+    } else if (value > 19 && value <= 39) {
       this.airConditionerAPI.setSpeed(Fanspeed.low, State.off, State.off);
       this.lastRotationSpeed = Fanspeed.low;
-    } else if (value > 39 && value < 59) {
+    } else if (value > 39 && value <= 59) {
       this.airConditionerAPI.setSpeed(Fanspeed.medium, State.off, State.off);
       this.lastRotationSpeed = Fanspeed.medium;
-    } else if (value > 59 && value < 79) {
+    } else if (value > 59 && value <= 79) {
       this.airConditionerAPI.setSpeed(Fanspeed.high, State.off, State.off);
       this.lastRotationSpeed = Fanspeed.high;
     } else if (value > 79) {
