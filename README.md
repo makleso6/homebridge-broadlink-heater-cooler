@@ -18,7 +18,13 @@ example config
             "ip": "192.168.1.76",
             "mac": "34:ea:34:96:e7:05",
             "name": "AirCon",
-            "increments": 0.5 or 1.0
+            "increments": 1, // step for set temperatur , default 0,5
+            "display": true, // display display button, default false
+            "health": true, // display health button, default false
+            "clean": true, // display clean button, default false
+            "mildew": true, // display mildew button, default false
+            "sleep": true // display sleep button, default false
+            "swing": 3 // 1 - only horizontal, 2 - only vertical, 3 - both, default 3
         }
     ],
     "platforms": [
