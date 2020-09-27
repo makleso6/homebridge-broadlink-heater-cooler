@@ -28,7 +28,8 @@ export declare const enum Fixation {
 export declare const enum Fanspeed {
   low = 3,
   medium = 2,
-  high = 1
+  high = 1,
+  auto = 5
 }
 
 export declare const enum Mode {
@@ -503,17 +504,55 @@ export class AirConditionerAPI {
       this.updateModel(this.model);
     }
 
-  // setPower(power: State) {
+    setDisplay(state: State) {
+      if (this.model.display === state) {
+        return;
+      }
+      this.model.display = state;
+      this.updateModel(this.model);
+    }
 
-  // }
+    setSwing(verticalFixation: Fixation, horizontalFixation: Fixation) {
+      if (this.model.verticalFixation === verticalFixation && this.model.horizontalFixation === horizontalFixation) {
+        return;
+      }
+      this.model.verticalFixation = verticalFixation;
+      this.model.horizontalFixation = horizontalFixation;
 
-  // setPower(power: State) {
+      this.updateModel(this.model);
+    }
 
-  // }
+    setHealth(state: State) {
+      if (this.model.health === state) {
+        return;
+      }
+      this.model.health = state;
+      this.updateModel(this.model);
+    }
 
-  // setPower(power: State) {
+    setClean(state: State) {
+      if (this.model.clean === state) {
+        return;
+      }
+      this.model.clean = state;
+      this.updateModel(this.model);
+    }
 
-  // }
+    setMildew(state: State) {
+      if (this.model.mildew === state) {
+        return;
+      }
+      this.model.mildew = state;
+      this.updateModel(this.model);
+    }
+
+    setSleep(state: State) {
+      if (this.model.sleep === state) {
+        return;
+      }
+      this.model.sleep = state;
+      this.updateModel(this.model);
+    }
 }
 
 

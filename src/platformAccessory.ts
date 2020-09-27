@@ -28,24 +28,59 @@ export class AirCondionerAccessory implements AccessoryPlugin {
   private readonly name: string;
   private airConditionerAPI: AirConditionerAPI;
   private lastRotationSpeed = Fanspeed.medium;
+
   private readonly service: Service;
   private readonly informationService: Service;
+  private readonly display: Service | undefined;
+  private readonly health: Service | undefined;
+  private readonly clean: Service | undefined;
+  private readonly mildew: Service | undefined;
+  private readonly sleep: Service | undefined;
+
+  private showDisplay = false;
+  private showHealth = false;
+  private showClean = false;
+  private showMildew = false;
+  private showSleep = false;
+
+  services: Service[]
+  private swing = 3;
 
   constructor(log: Logging, config: AccessoryConfig, api: API) {
     this.log = log;
     this.name = config.name;
     this.api = api;
+    this.services = [];
     const ip: string = config['ip'] as string;
     const mac: string = config['mac'] as string;
     let increments = 0.5;
     if ('increments' in config) {
       increments = config['increments'] as number;
     }
-    // console.log('ip', ip);
-    // console.log('mac', mac);
 
-    // this.Service = this.api.hap.Service;
-    // this.Characteristic = this.api.hap.Characteristic;
+    if ('swing' in config) {
+      this.swing = config['swing'] as number;
+    }
+
+    if ('display' in config) {
+      this.showDisplay = config['display'] as boolean;
+    }
+
+    if ('health' in config) {
+      this.showHealth = config['health'] as boolean;
+    }
+
+    if ('clean' in config) {
+      this.showClean = config['clean'] as boolean;
+    }
+
+    if ('mildew' in config) {
+      this.showMildew = config['mildew'] as boolean;
+    }
+
+    if ('sleep' in config) {
+      this.showSleep = config['sleep'] as boolean;
+    }
 
 
     this.airConditionerAPI = new AirConditionerAPI(ip, mac);
@@ -77,20 +112,63 @@ export class AirCondionerAccessory implements AccessoryPlugin {
       .on('get', this.handleRotationSpeedGet.bind(this))
       .on('set', this.handleRotationSpeedSet.bind(this));
 
+    this.service.getCharacteristic(api.hap.Characteristic.SwingMode)
+      .on('get', this.handleSwingGet.bind(this))
+      .on('set', this.handleSwingSet.bind(this));
+
     this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).props.minValue = 16;
     this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).props.maxValue = 32;
     this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.minValue = 16;
     this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.maxValue = 32;
 
-    this.service.getCharacteristic(api.hap.Characteristic.RotationSpeed).props.minValue = 1;
-    this.service.getCharacteristic(api.hap.Characteristic.RotationSpeed).props.maxValue = 5;
-
     this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).props.minStep = increments;
     this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).props.minStep = increments;
+    this.services.push(this.service);
 
     this.informationService = new api.hap.Service.AccessoryInformation()
-      .setCharacteristic(api.hap.Characteristic.Manufacturer, 'Custom Manufacturer')
-      .setCharacteristic(api.hap.Characteristic.Model, 'Custom Model');
+      .setCharacteristic(api.hap.Characteristic.Manufacturer, 'AUX')
+      .setCharacteristic(api.hap.Characteristic.Model, 'Broadlink');
+    this.services.push(this.informationService);
+
+    if (this.showDisplay) {
+      this.display = new api.hap.Service.Switch('Display', 'Display');
+      this.display.getCharacteristic(api.hap.Characteristic.On)
+        .on('get', this.handleDisplayGet.bind(this))
+        .on('set', this.handleDisplaySet.bind(this));
+      this.services.push(this.display);
+    }
+
+    if (this.showHealth) {
+      this.health = new api.hap.Service.Switch('Health', 'Health');
+      this.health.getCharacteristic(api.hap.Characteristic.On)
+        .on('get', this.handleHealthGet.bind(this))
+        .on('set', this.handleHealthSet.bind(this));
+      this.services.push(this.health);
+    }
+
+    if (this.showClean) {
+      this.clean = new api.hap.Service.Switch('Clean', 'Clean');
+      this.clean.getCharacteristic(api.hap.Characteristic.On)
+        .on('get', this.handleCleanGet.bind(this))
+        .on('set', this.handleCleanSet.bind(this));
+      this.services.push(this.clean);
+    }
+
+    if (this.showMildew) {
+      this.mildew = new api.hap.Service.Switch('Mildew', 'Mildew');
+      this.mildew.getCharacteristic(api.hap.Characteristic.On)
+        .on('get', this.handleMildewGet.bind(this))
+        .on('set', this.handleMildewSet.bind(this));
+      this.services.push(this.mildew);
+    }
+
+    if (this.showSleep) {
+      this.sleep = new api.hap.Service.Switch('Sleep', 'Sleep');
+      this.sleep.getCharacteristic(api.hap.Characteristic.On)
+        .on('get', this.handleSleepGet.bind(this))
+        .on('set', this.handleSleepSet.bind(this));
+      this.services.push(this.sleep);
+    }
 
     api.on('didFinishLaunching', () => {
       this.airConditionerAPI.connect();
@@ -101,24 +179,41 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     }, 5000);
 
     this.airConditionerAPI.on('updateState', () => {
-      // console.log('updateState');
       this.service.getCharacteristic(api.hap.Characteristic.CoolingThresholdTemperature).updateValue(this.thresholdTemperature());
       this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).updateValue(this.thresholdTemperature());
       this.service.getCharacteristic(api.hap.Characteristic.CurrentHeaterCoolerState).updateValue(this.currentHeaterCoolerState());
       this.service.getCharacteristic(api.hap.Characteristic.TargetHeaterCoolerState).updateValue(this.targetHeaterCoolerState());
       this.service.getCharacteristic(api.hap.Characteristic.Active).updateValue(this.active());
       this.service.getCharacteristic(api.hap.Characteristic.CurrentTemperature).updateValue(this.currentTemperature());
-      // this.service.getCharacteristic(api.hap.Characteristic.HeatingThresholdTemperature).value = this.thresholdTemperature();
+      this.service.getCharacteristic(api.hap.Characteristic.SwingMode).updateValue(this.swingValue());
+      this.service.getCharacteristic(api.hap.Characteristic.RotationSpeed).updateValue(this.rotationSpeed());
+
+      if (this.showDisplay) {
+        this.display!.getCharacteristic(api.hap.Characteristic.On).updateValue(this.displayValue());
+      }
+
+      if (this.showHealth) {
+        this.health!.getCharacteristic(api.hap.Characteristic.On).updateValue(this.healthValue());
+      }
+
+      if (this.showClean) {
+        this.clean!.getCharacteristic(api.hap.Characteristic.On).updateValue(this.cleanValue());
+      }
+
+      if (this.showMildew) {
+        this.mildew!.getCharacteristic(api.hap.Characteristic.On).updateValue(this.mildewValue());
+      }
+
+      if (this.showSleep) {
+        this.sleep!.getCharacteristic(api.hap.Characteristic.On).updateValue(this.sleepValue());
+      }
   
     });
 
   }
 
   getServices(): Service[] {
-    return [
-      this.informationService,
-      this.service,
-    ];
+    return this.services;
   }
 
   active(): number {
@@ -138,9 +233,7 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     callback(null, currentValue);
   }
 
-  /**
-   * Handle requests to set the "Active" characteristic
-   */
+
   handleActiveSet(value, callback) {
     this.log.debug('Triggered SET Active:', value);
     if (value === 1) {
@@ -165,9 +258,6 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     return currentValue;
   }
 
-  /**
-   * Handle requests to get the current value of the "Current Heater Cooler State" characteristic
-   */
   handleCurrentHeaterCoolerStateGet(callback) {
     this.log.debug('Triggered GET CurrentHeaterCoolerState');
 
@@ -190,9 +280,6 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     return currentValue;
   }
 
-  /**
-   * Handle requests to get the current value of the "Target Heater Cooler State" characteristic
-   */
   handleTargetHeaterCoolerStateGet(callback) {
     this.log.debug('Triggered GET TargetHeaterCoolerState');
 
@@ -201,9 +288,6 @@ export class AirCondionerAccessory implements AccessoryPlugin {
     callback(null, currentValue);
   }
 
-  /**
-   * Handle requests to set the "Target Heater Cooler State" characteristic
-   */
   handleTargetHeaterCoolerStateSet(value, callback) {
     this.log.debug('Triggered SET TargetHeaterCoolerState:', value);
 
@@ -241,26 +325,24 @@ export class AirCondionerAccessory implements AccessoryPlugin {
   handleThresholdTemperatureGet(callback) {
     this.log.debug('Triggered GET ThresholdTemperature');
 
-    // set this to a valid value for CurrentTemperature
     const currentValue = this.thresholdTemperature();
 
     callback(null, currentValue);
   }
-
   
   private rotationSpeed(): number {
     let currentValue = 1;
      
     if (this.airConditionerAPI.model.turbo === State.on) {
-      currentValue = 5;
+      currentValue = 100;
     } else if (this.airConditionerAPI.model.mute === State.on) {
-      currentValue = 1;
+      currentValue = 10;
     } else if (this.airConditionerAPI.model.fanspeed === Fanspeed.high) {
-      currentValue = 4;
+      currentValue = 60;
     } else if (this.airConditionerAPI.model.fanspeed === Fanspeed.medium) {
-      currentValue = 3;
+      currentValue = 40;
     } else if (this.airConditionerAPI.model.fanspeed === Fanspeed.low) {
-      currentValue = 2;
+      currentValue = 20;
     }
     return currentValue;
   }
@@ -273,22 +355,180 @@ export class AirCondionerAccessory implements AccessoryPlugin {
 
   handleRotationSpeedSet(value, callback) {
     this.log.debug('Triggered SET RotationSpeed:', value);
-    if (value === 1) {
+    if (value > 1 && value < 19) {
       this.airConditionerAPI.setSpeed(this.lastRotationSpeed, State.off, State.on);
-    } else if (value === 2) {
+    } else if (value > 19 && value < 39) {
       this.airConditionerAPI.setSpeed(Fanspeed.low, State.off, State.off);
       this.lastRotationSpeed = Fanspeed.low;
-    } else if (value === 3) {
+    } else if (value > 39 && value < 59) {
       this.airConditionerAPI.setSpeed(Fanspeed.medium, State.off, State.off);
       this.lastRotationSpeed = Fanspeed.medium;
-    } else if (value === 4) {
+    } else if (value > 59 && value < 79) {
       this.airConditionerAPI.setSpeed(Fanspeed.high, State.off, State.off);
       this.lastRotationSpeed = Fanspeed.high;
-    } else if (value === 5) {
+    } else if (value > 79) {
       this.airConditionerAPI.setSpeed(this.lastRotationSpeed, State.on, State.off);
     }
 
     callback(null);
   }
 
+  handleDisplaySet(value, callback) {
+    this.log.debug('Triggered SET Display:', value);
+    if (value === true) {
+      this.airConditionerAPI.setDisplay(State.on);
+    } else {
+      this.airConditionerAPI.setDisplay(State.off);
+    }
+    callback(null);
+  }
+
+  private displayValue(): boolean {
+    return this.airConditionerAPI.model.display === State.on;
+  }
+
+  handleDisplayGet(callback) {
+    this.log.debug('Triggered GET Display');
+
+    const currentValue = this.displayValue();
+
+    callback(null, currentValue);
+  }
+
+  handleSwingSet(value, callback) {
+    this.log.debug('Triggered SET Swing:', value);
+    if (value === 1) {
+      if (this.swing === 1) {
+        this.airConditionerAPI.setSwing(Fixation.off, Fixation.on);
+      } else if (this.swing === 2) {
+        this.airConditionerAPI.setSwing(Fixation.on, Fixation.off);
+      } else if (this.swing === 3) {
+        this.airConditionerAPI.setSwing(Fixation.on, Fixation.on);
+      }
+    } else {
+      this.airConditionerAPI.setSwing(Fixation.off, Fixation.off);
+    }
+    callback(null);
+  }
+
+  private swingValue(): number {
+    if (this.swing === 1) {
+      if (this.airConditionerAPI.model.horizontalFixation === Fixation.on) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else if (this.swing === 2) {
+      if (this.airConditionerAPI.model.verticalFixation === Fixation.on) {
+        return 1;
+      } else {
+        return 0;
+      }
+    } else if (this.swing === 3) {
+      // eslint-disable-next-line max-len
+      if (this.airConditionerAPI.model.verticalFixation === Fixation.on && this.airConditionerAPI.model.horizontalFixation === Fixation.on) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+    return 0;
+
+  }
+
+  handleSwingGet(callback) {
+    this.log.debug('Triggered GET Swing');
+
+    const currentValue = this.swingValue();
+
+    callback(null, currentValue);
+  }
+
+  handleHealthSet(value, callback) {
+    this.log.debug('Triggered SET Health:', value);
+    if (value === true) {
+      this.airConditionerAPI.setHealth(State.on);
+    } else {
+      this.airConditionerAPI.setHealth(State.off);
+    }
+    callback(null);
+  }
+
+  private healthValue(): boolean {
+    return this.airConditionerAPI.model.health === State.on;
+  }
+
+  handleHealthGet(callback) {
+    this.log.debug('Triggered GET Health');
+
+    const currentValue = this.healthValue();
+
+    callback(null, currentValue);
+  }
+
+  handleCleanSet(value, callback) {
+    this.log.debug('Triggered SET Clean:', value);
+    if (value === true) {
+      this.airConditionerAPI.setClean(State.on);
+    } else {
+      this.airConditionerAPI.setClean(State.off);
+    }
+    callback(null);
+  }
+
+  private cleanValue(): boolean {
+    return this.airConditionerAPI.model.clean === State.on;
+  }
+
+  handleCleanGet(callback) {
+    this.log.debug('Triggered GET Clean');
+
+    const currentValue = this.cleanValue();
+
+    callback(null, currentValue);
+  }
+
+  handleMildewSet(value, callback) {
+    this.log.debug('Triggered SET Mildew:', value);
+    if (value === true) {
+      this.airConditionerAPI.setMildew(State.on);
+    } else {
+      this.airConditionerAPI.setMildew(State.off);
+    }
+    callback(null);
+  }
+
+  private mildewValue(): boolean {
+    return this.airConditionerAPI.model.mildew === State.on;
+  }
+
+  handleMildewGet(callback) {
+    this.log.debug('Triggered GET Mildew');
+
+    const currentValue = this.mildewValue();
+
+    callback(null, currentValue);
+  }
+
+  handleSleepSet(value, callback) {
+    this.log.debug('Triggered SET Sleep:', value);
+    if (value === true) {
+      this.airConditionerAPI.setSleep(State.on);
+    } else {
+      this.airConditionerAPI.setSleep(State.off);
+    }
+    callback(null);
+  }
+
+  private sleepValue(): boolean {
+    return this.airConditionerAPI.model.sleep === State.on;
+  }
+
+  handleSleepGet(callback) {
+    this.log.debug('Triggered GET Sleep');
+
+    const currentValue = this.sleepValue();
+
+    callback(null, currentValue);
+  }
 }
