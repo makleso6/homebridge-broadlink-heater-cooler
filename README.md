@@ -36,9 +36,12 @@ example config
     ]
 }
 ```
-Fanspeed: 
-1 - 19: mute
-20 - 39: low
-40 - 59: medium
-60 - 79: high
-80 - 100: turbo
+
+
+Fanspeed 
+--- | --- 
+1 - 19 | mute
+20 - 39 | low
+40 - 59 | medium
+60 - 79 | high
+80 - 100 | turbo
