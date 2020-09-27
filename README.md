@@ -38,7 +38,7 @@ example config
 ```
 
 
-Fanspeed | Fanspeed
+Fanspeed | AC equivalent
 --- | --- 
 1 - 19 | mute
 20 - 39 | low
