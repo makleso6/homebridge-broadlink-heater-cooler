@@ -43,7 +43,7 @@ example config.json
 ```
 
 | Fields               | Description                                                                     | Required | Default value |
-|----------------------|---------------------------------------------------------------------------------|----------|               |
+|----------------------|---------------------------------------------------------------------------------|----------|-------------- |
 | ip                   | Air Conditioner IP address in IPv4. Make sure it is static.                     | Yes      |               |
 | mac                  | Air Conditioner MAC address.                                                    | Yes      |               |
 | increments           | Temperature set step.                                                           | No       | 0,5           |
@@ -53,6 +53,8 @@ example config.json
 | mildew               | Show //Mildew// button for turn on/off mildew mode.                             | No       | false         |
 | sleep                | Show //Sleep// button for turn on/off sleep mode.                               | No       | false         |
 | swing                | Swing 1 - only horizontal, 2 - only vertical, 3 - both.                         | No       | 3             |
+
+
 
 | Fanspeed | AC equivalent |
 |--------- | --------------|
