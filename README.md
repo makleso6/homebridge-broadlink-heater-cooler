@@ -1,5 +1,5 @@
 # homebridge-broadlink-heater-cooler
-
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/makleso6/homebridge-broadlink-heater-cooler/Build%20and%20Lint)
 [![GitHub last commit](https://img.shields.io/github/last-commit/makleso6/homebridge-broadlink-heater-cooler.svg)](https://github.com/makleso6/homebridge-broadlink-heater-cooler)
 [![npm](https://img.shields.io/npm/dt/homebridge-broadlink-heater-cooler.svg)](https://www.npmjs.com/package/homebridge-broadlink-heater-cooler)
 [![npm version](https://badge.fury.io/js/homebridge-broadlink-heater-cooler.svg)](https://badge.fury.io/js/homebridge-broadlink-heater-cooler)
