@@ -2,8 +2,6 @@
     "pluginAlias": "AirCondionerAccessory",
     "pluginType": "accessory",
     "singular": false,
-    "headerDisplay": "Optional content to display above the plugin config. Supports markdown.",
-    "footerDisplay": "Optional content to display below the plugin config. Supports markdown.",
     "schema": {
       "type": "object",
       "properties": {
@@ -55,7 +53,12 @@
             "title": "Mildew",
             "type": "boolean",
             "required": false
-          },
+        },
+        "auto": {
+          "title": "Auto fan speed",
+          "type": "boolean",
+          "required": false
+        },
         "swing": {
           "title": "Swing",
           "type": "integer",
