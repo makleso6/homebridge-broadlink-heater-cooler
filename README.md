@@ -61,7 +61,7 @@ Edit your `config.json` accordingly. Configuration sample:
 | clean                | Show *Clean* button for turn on/off clean mode.                                 | No       | false         |
 | mildew               | Show *Mildew* button for turn on/off mildew mode.                               | No       | false         |
 | sleep                | Show *Sleep* button for turn on/off sleep mode.                                 | No       | false         |
-| auto                 | Show *Auto* button for set Air Conditioner auto fan speed.                      | No       | 3             |
+| auto                 | Show *Auto* button for set Air Conditioner auto fan speed.                      | No       | false         |
 | swing                | Swing 1 - only horizontal, 2 - only vertical, 3 - both.                         | No       | 3             |
 
 
