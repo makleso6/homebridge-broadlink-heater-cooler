@@ -2,24 +2,12 @@ import {
   AccessoryConfig,
   AccessoryPlugin,
   API,
-  CharacteristicEventTypes,
-  CharacteristicGetCallback,
-  CharacteristicSetCallback,
-  CharacteristicValue,
-  HAP,
   Logging,
   Service,
-  
 } from 'homebridge';
-// import {
-//   HomeKitTypes
-// } from './node_modules/homebridge/lib';
 
-// AirConditionerAPI
-// AirConditioner
 
-import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from './AirConditionerAPI';
-// import { AirConditionerAPI, AirConditioner, State, Mode, Fixation, Fanspeed } from 'broadlink-aircon-api';
+import { AirConditionerAPI, State, Mode, Fixation, Fanspeed } from 'broadlink-aircon-api';
 
 export class AirCondionerAccessory implements AccessoryPlugin {
 
@@ -261,7 +249,6 @@ export class AirCondionerAccessory implements AccessoryPlugin {
   handleCurrentHeaterCoolerStateGet(callback) {
     this.log.debug('Triggered GET CurrentHeaterCoolerState');
 
-    // set this to a valid value for CurrentHeaterCoolerState
     const currentValue = this.currentHeaterCoolerState();
 
     callback(null, currentValue);
