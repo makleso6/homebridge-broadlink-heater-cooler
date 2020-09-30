@@ -3,7 +3,6 @@
 [![GitHub last commit](https://img.shields.io/github/last-commit/makleso6/homebridge-broadlink-heater-cooler.svg)](https://github.com/makleso6/homebridge-broadlink-heater-cooler)
 [![npm](https://img.shields.io/npm/dt/homebridge-broadlink-heater-cooler.svg)](https://www.npmjs.com/package/homebridge-broadlink-heater-cooler)
 [![npm version](https://badge.fury.io/js/homebridge-broadlink-heater-cooler.svg)](https://badge.fury.io/js/homebridge-broadlink-heater-cooler)
-[![dependencies Status](https://david-dm.org/makleso6/homebridge-broadlink-heater-cooler/status.svg)](https://david-dm.org/makleso6/homebridge-broadlink-heater-cooler)
 
 Homebridge Plugin for the controll AUX-family Air Conditioners (AC Freedom app).
 
