@@ -1,8 +1,8 @@
-# WIP
-This project in progress.
+[![GitHub last commit](https://img.shields.io/github/last-commit/makleso6/homebridge-broadlink-heater-cooler.svg)](https://github.com/makleso6/homebridge-broadlink-heater-cooler)
 
 
-example config
+
+example config.json
 
 ```
 {
