@@ -1,48 +1,64 @@
+# homebridge-broadlink-heater-cooler
+
 [![GitHub last commit](https://img.shields.io/github/last-commit/makleso6/homebridge-broadlink-heater-cooler.svg)](https://github.com/makleso6/homebridge-broadlink-heater-cooler)
 [![npm](https://img.shields.io/npm/dt/homebridge-broadlink-heater-cooler.svg)](https://www.npmjs.com/package/homebridge-broadlink-heater-cooler)
 [![npm version](https://badge.fury.io/js/homebridge-broadlink-heater-cooler.svg)](https://badge.fury.io/js/homebridge-broadlink-heater-cooler)
 [![dependencies Status](https://david-dm.org/makleso6/homebridge-broadlink-heater-cooler/status.svg)](https://david-dm.org/makleso6/homebridge-broadlink-heater-cooler)
 
+Homebridge Plugin for the controll AUX-family Air Conditioners (AC Freedom app).
+
+## Installation
+
+1. Install Homebridge using the [official instructions](https://github.com/homebridge/homebridge/wiki).
+2. Install this plugin using `sudo npm install -g homebridge-broadlink-heater-cooler --unsafe-perm`.
+3. Update your configuration file. See configuration sample below.
+
+
 example config.json
 
-```
+```json
 {
     "bridge": {
         "name": "Homebridge 9184",
-        "username": "0E:8A:24:4B:91:84",
-        "port": 51451,
-        "pin": "419-60-112"
+        "username": "00:00:00:00:00:00",
+        "port": 99999,
+        "pin": "111-111-111"
     },
     "accessories": [
         {
             "accessory": "AirCondionerAccessory",
-            "ip": "192.168.1.76",
-            "mac": "34:ea:34:96:e7:05",
+            "ip": "192.168.1.1",
+            "mac": "AA:BB:CC:DD:EE:FF",
             "name": "AirCon",
-            "increments": 1, // step for set temperature , default 0,5
-            "display": true, // display display button, default false
-            "health": true, // display health button, default false
-            "clean": true, // display clean button, default false
-            "mildew": true, // display mildew button, default false
-            "sleep": true // display sleep button, default false
-            "swing": 3 // 1 - only horizontal, 2 - only vertical, 3 - both, default 3
+            "increments": 1,
+            "display": true,
+            "health": true,
+            "clean": true,
+            "mildew": true,
+            "sleep": true,
+            "swing": 3
         }
     ],
-    "platforms": [
-        {
-            "name": "Config",
-            "port": 8581,
-            "platform": "config"
-        }
-    ]
+    "platforms": []
 }
 ```
 
+| Fields               | Description                                                                     | Required | Default value |
+|----------------------|---------------------------------------------------------------------------------|----------|               |
+| ip                   | Air Conditioner IP address in IPv4. Make sure it is static.                     | Yes      |               |
+| mac                  | Air Conditioner MAC address.                                                    | Yes      |               |
+| increments           | Temperature set step.                                                           | No       | 0,5           |
+| display              | Show //Display// button for turn on/off display                                 | No       | false         |
+| health               | Show //Display// button for turn on/off health mode.                            | No       | false         |
+| clean                | Show //Clean// button for turn on/off clean mode.                               | No       | false         |
+| mildew               | Show //Mildew// button for turn on/off mildew mode.                             | No       | false         |
+| sleep                | Show //Sleep// button for turn on/off sleep mode.                               | No       | false         |
+| swing                | Swing 1 - only horizontal, 2 - only vertical, 3 - both.                         | No       | 3             |
 
-Fanspeed | AC equivalent
---- | --- 
-1 - 19 | mute
-20 - 39 | low
-40 - 59 | medium
-60 - 79 | high
-80 - 100 | turbo
+| Fanspeed | AC equivalent |
+|--------- | --------------|
+| 1 - 19   | mute          |
+| 20 - 39  | low           |
+| 40 - 59  | medium        |
+| 60 - 79  | high          |
+| 80 - 100 | turbo         |
