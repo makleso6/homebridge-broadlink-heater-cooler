@@ -12,8 +12,9 @@ Homebridge Plugin for the controll AUX-family Air Conditioners (AC Freedom app).
 2. Install this plugin using `sudo npm install -g homebridge-broadlink-heater-cooler --unsafe-perm`.
 3. Update your configuration file. See configuration sample below.
 
+### Configuration
 
-example config.json
+Edit your `config.json` accordingly. Configuration sample:
 
 ```json
 {
@@ -47,11 +48,11 @@ example config.json
 | ip                   | Air Conditioner IP address in IPv4. Make sure it is static.                     | Yes      |               |
 | mac                  | Air Conditioner MAC address.                                                    | Yes      |               |
 | increments           | Temperature set step.                                                           | No       | 0,5           |
-| display              | Show //Display// button for turn on/off display                                 | No       | false         |
-| health               | Show //Display// button for turn on/off health mode.                            | No       | false         |
-| clean                | Show //Clean// button for turn on/off clean mode.                               | No       | false         |
-| mildew               | Show //Mildew// button for turn on/off mildew mode.                             | No       | false         |
-| sleep                | Show //Sleep// button for turn on/off sleep mode.                               | No       | false         |
+| display              | Show *Display* button for turn on/off display                                   | No       | false         |
+| health               | Show *Health* button for turn on/off health mode.                               | No       | false         |
+| clean                | Show *Clean* button for turn on/off clean mode.                                 | No       | false         |
+| mildew               | Show *Mildew* button for turn on/off mildew mode.                               | No       | false         |
+| sleep                | Show *Sleep* button for turn on/off sleep mode.                                 | No       | false         |
 | swing                | Swing 1 - only horizontal, 2 - only vertical, 3 - both.                         | No       | 3             |
 
 
