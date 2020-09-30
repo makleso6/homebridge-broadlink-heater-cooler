@@ -14,13 +14,16 @@
           "title": "IP",
           "type": "string",
           "required": true,
-          "format": "ipv4"
+          "format": "ipv4",
+          "placeholder": "192.168.1.1"
         },
         "mac": {
             "title": "MAC Address",
             "type": "string",
             "pattern": "^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$",
-            "required": true
+            "required": true,
+            "placeholder": "ea:34:96:e7:34:05"
+
           },
         "increments": {
           "title": "Increments",
