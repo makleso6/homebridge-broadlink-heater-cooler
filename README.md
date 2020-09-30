@@ -6,6 +6,13 @@
 
 Homebridge Plugin for the control AUX-family Air Conditioners based on Broadlink [Wi-Fi module](https://aliexpress.ru/item/4000287184204.html) (AC Freedom app).
 
+## Features
+
+* Most of the original app's methods are supported.
+* Works via LAN, no need internet connection.
+* Very fast operation speed.
+* Feedback is supported.
+
 ## Installation
 
 1. Install Homebridge using the [official instructions](https://github.com/homebridge/homebridge/wiki).
@@ -36,6 +43,7 @@ Edit your `config.json` accordingly. Configuration sample:
             "clean": true,
             "mildew": true,
             "sleep": true,
+            "auto": true,
             "swing": 3
         }
     ],
@@ -53,8 +61,8 @@ Edit your `config.json` accordingly. Configuration sample:
 | clean                | Show *Clean* button for turn on/off clean mode.                                 | No       | false         |
 | mildew               | Show *Mildew* button for turn on/off mildew mode.                               | No       | false         |
 | sleep                | Show *Sleep* button for turn on/off sleep mode.                                 | No       | false         |
+| auto                 | Show *Auto* button for set Air Conditioner auto fan speed.                      | No       | 3             |
 | swing                | Swing 1 - only horizontal, 2 - only vertical, 3 - both.                         | No       | 3             |
-
 
 
 | Fanspeed | AC equivalent |
@@ -64,3 +72,12 @@ Edit your `config.json` accordingly. Configuration sample:
 | 40 - 59  | medium        |
 | 60 - 79  | high          |
 | 80 - 100 | turbo         |
+
+## Communication
+
+Remember that this is not a commercial product, but the result of free labor.
+
+- If you need help using this plugin, open an issue here on GitHub. The more detail the better!
+- If you found a bug, open an issue here on GitHub. The more detail the better!
+- If you want to contribute, submit a pull request.
+- If you have suggestions for improvement, you are welcome.
