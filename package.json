@@ -2,7 +2,7 @@
   "private": false,
   "displayName": "AC Freedom",
   "name": "homebridge-broadlink-heater-cooler",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Controll your AC from AC Freedom App via homebridge.",
   "license": "Apache-2.0",
   "repository": {
