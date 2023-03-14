@@ -7,6 +7,9 @@
 
 Homebridge Plugin for the control AUX-family Air Conditioners based on Broadlink [Wi-Fi module](https://aliexpress.ru/item/4000287184204.html) (AC Freedom app).
 
+⚠️**WARNING**⚠️
+
+🔴**some air conditioners may not work with this plugin due to firmware incompatibility**🔴
 ## Features
 
 * Most of the original app's methods are supported.
